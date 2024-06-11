@@ -3,8 +3,54 @@ const FETCHTOKEN =
   "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjY3NDRhNjdmNmI0YjAwMTU0MjhmYzciLCJpYXQiOjE3MTgwNDM4MTQsImV4cCI6MTcxOTI1MzQxNH0.SXzbkbBeQ3k_Id3jleh3mqKxiDVVMO0B3PmJiY3Q7Sk";
 const ID = "666844fb8fc0f300155e5aca";
 
-document.addEventListener("DOMContentLoaded", () => {});
-
+document.addEventListener("DOMContentLoaded", () => {
+  console.log(
+    "DOMContentLoaded => localStorage.type\n",
+    localStorage.getItem("type")
+  );
+  /**
+   * se non è già stato definito che tipo di utente sta visitando la pagina allora imposto il tipo di utente su utente normale
+   */
+  if (localStorage.getItem("type") === null)
+    localStorage.setItem("type", "user");
+  console.log(
+    "DOMContentLoaded => localStorage.type\n",
+    localStorage.getItem("type")
+  );
+  /**
+   * recupero headers
+   */
+  const header = document.querySelector("header");
+  let main = `
+  <main class="container">
+    <div class="row gx-3 gy-3">
+    </div>
+  </main>
+    `;
+  header.insertAdjacentHTML("afterend", main);
+  main = document.querySelector("main .row");
+  const card = `
+      <div class="col-3">
+        <div class="card">
+          <img src="${IMMAGINE}" class="card-img-top" alt="${DESCRIZIONE_IMMAGINE}">
+          <div class="card-body">
+            <h5 class="card-title">${TITOLO}</h5>
+            <p class="card-text">${DESCRIZIONE}</p>
+            <a href="#" class="btn btn-primary">
+              <span class="material-symbols-outlined">add_shopping_cart</span>
+            </a>
+            <a href="#" class="btn btn-primary">
+              <span class="material-symbols-outlined">edit</span>
+            </a>
+            <a href="#" class="btn btn-primary">
+              <span class="material-symbols-outlined">delete</span>
+            </a>
+          </div>
+        </div>
+      </div>
+  `;
+  main.innerHTML += card;
+});
 async function getData() {
   await fetch(FETCHURL, {
     method: "GET",
@@ -107,4 +153,4 @@ function reverseAccess(reverse) {
 /**
  * DA ELIMINARE
  */
-const TEST = document.querySelector("span");
+const TESTHTML = document.querySelector("span");
