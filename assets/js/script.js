@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (localStorage.getItem("type") === "admin") {
     innesto.innerHTML += `
-    <button class="btn btn-primary material-symbols-outlined" onclick="addProduct()">add</button>
+    <button class="btn btn-primary material-symbols-outlined" data-bs-target="#ModalToggle" data-bs-toggle="modal" onclick="addProduct()">add</button>
     `;
   }
   for (const PRODUCT of products) {
@@ -93,10 +93,10 @@ function createCard(product) {
     );
     card += `
                       <a href="#" class="btn btn-primary">
-                        <button type="submit" class="btn btn-primary material-symbols-outlined" data-bs-target="#exampleModalToggle" data-bs-toggle="modal" onclick="editProduct('${product.id}')">edit</button>
+                        <button type="button" class="btn btn-primary material-symbols-outlined" data-bs-target="#ModalToggle" data-bs-toggle="modal" onclick="editProduct('${product.id}')">edit</button>
                       </a>
                       <a href="#" class="btn btn-primary">
-                        <button type="submit" class="btn btn-primary material-symbols-outlined" onclick="deleteData('${product.id}')">delete</button>
+                        <button type="button" class="btn btn-primary material-symbols-outlined" onclick="deleteData('${product.id}')">delete</button>
                       </a>
                     </div>
                     </div>
@@ -140,7 +140,8 @@ function login() {
   let password = document.querySelector("input[type=password]").value;
   // if (email === products[0].name && password === products[0].description)
   if (email === "a@a.a" && password === "a")
-    localStorage.setItem("type", "admin");
+    {localStorage.setItem("type", "admin");
+  location.reload();}
   else alert("Username e password non corretti.");
 }
 
@@ -151,14 +152,21 @@ function logout() {
 }
 
 /** posta i dati nella API */
-async function postData(ADD) {
+async function postData() {
   await fetch(FETCHURL, {
     method: "POST",
     headers: {
       "content-type": "application/json",
       Authorization: FETCHTOKEN,
     },
-    body: JSON.stringify({ ADD }),
+    body: JSON.stringify({
+      name: "gag",
+      description: "jfgdhj",
+      brand: "ukyh",
+      imageUrl:
+        "https://banner2.cleanpng.com/20180711/iqy/kisspng-github-computer-icons-github-logo-5b459a3d238b60.4061479515312881251456.jpg",
+      price: 0,
+    }),
   })
     .then((response) => {
       console.log("POSTDATA => response\n", response);
@@ -261,13 +269,28 @@ function deleteProduct(id) {}
 
 /** funzione per aggiungere un prodotto */
 function addProduct() {
+  console.log(document.querySelector("#editModal .row h6:first-of-type"));
+  // .classList.add("d-none");
+  console.log(document.getElementById("name").parentElement);
+  // .classList.add("d-none");
   const ADD = {
-    name: document.getElementById("editName").value,
-    description: document.getElementById("editDescription").value,
-    brand: document.getElementById("editBrand").value,
-    image: document.getElementById("editImage").value,
-    price: document.getElementById("editPrice").value,
+    name: "gag",
+    description: "jfgdhj",
+    brand: "ukyh",
+    image:
+      "https://banner2.cleanpng.com/20180711/iqy/kisspng-github-computer-icons-github-logo-5b459a3d238b60.4061479515312881251456.jpg",
+    price: 0,
+    // name: document.getElementById("editName").value,
+    // description: document.getElementById("editDescription").value,
+    // brand: document.getElementById("editBrand").value,
+    // image: document.getElementById("editImage").value,
+    // price: document.getElementById("editPrice").value,
   };
   console.log("ADDPRODUCT => \n", ADD);
   postData(ADD);
 }
+
+/**
+ * - mostrare prodotti come lista
+ * - barra superiore multifunzione : ( filtro brand, filtro nome, aggiunta prodotto, scelta "mostra come card/lista")
+ */
