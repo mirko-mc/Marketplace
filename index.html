@@ -43,8 +43,7 @@
   <!-- FINE HEADER --------------------------------------------------------------------------- -->
   <!-- DOPPIO MODAL ------------------------------------------------------------------- -->
   <section id="editModal">
-    <div class="modal fade" id="ModalToggle" aria-hidden="true" aria-labelledby="ModalToggleLabel"
-      tabindex="-1">
+    <div class="modal fade" id="ModalToggle" aria-hidden="true" aria-labelledby="ModalToggleLabel" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -58,11 +57,11 @@
                 <h6 class="col-sm-5 col-form-label text-center offset-2">Valore attuale</h6>
                 <h6 class="col-sm-5 col-form-label text-center">Nuovo valore</h6>
                 <div class="col-sm-2 ">
-                  <label for="name" class="col-form-label">Name</label>
-                  <label for="description" class="col-form-label">Description</label>
-                  <label for="brand" class="col-form-label">Brand</label>
-                  <label for="image" class="col-form-label">Image</label>
-                  <label for="price" class="col-form-label">Price</label>
+                  <label for="name" class="col-form-label w-100">Name</label>
+                  <label for="description" class="col-form-label w-100">Description</label>
+                  <label for="brand" class="col-form-label w-100">Brand</label>
+                  <label for="image" class="col-form-label w-100">Image</label>
+                  <label for="price" class="col-form-label w-100">Price</label>
                 </div>
                 <div class="col-sm-5">
                   <input type="text" readonly class="form-control-plaintext" id="name" value="">
@@ -88,8 +87,7 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="ModalToggle2" aria-hidden="true" aria-labelledby="ModalToggleLabel2"
-      tabindex="-1">
+    <div class="modal fade" id="ModalToggle2" aria-hidden="true" aria-labelledby="ModalToggleLabel2" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -102,19 +100,42 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-target="#ModalToggle"
               data-bs-toggle="modal">Annulla</button>
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="Conferma" id="saveEdit"
-              onclick="saveEdit(this.id)">Conferma</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="Conferma"
+              id="saveEdit">Conferma</button>
           </div>
         </div>
       </div>
     </div>
-    <button class="btn btn-primary" data-bs-target="#ModalToggle" data-bs-toggle="modal">Edit product</button>
   </section>
   <!-- FINE DOPPIO MODAL ------------------------------------------------------------------- -->
-  <button onclick="getData()">GET</button>
-  <button onclick="postData()">POST</button>
-  <button onclick="deleteData()">DELETE</button>
-  <button onclick="putData()">PUT</button>
+
+  <!-- TEST -->
+    <section id="adminBar" class="container">
+      <div class="row gx-3 gy-3">
+        <div class="col-1 bg-danger">
+          <button class="btn btn-primary material-symbols-outlined w-100" data-bs-target="#ModalToggle"
+            data-bs-toggle="modal" onclick="addProduct()" alt="Aggiungi prodotto">add</button>
+        </div>
+        <div class="col-10 bg-black">
+            <div class="input-group mb-3">
+              <select class="form-select" id="typeMedia">
+                <option selected value="brand">Brand</option>
+                <option value="name">Name</option>
+                <input type="text" class="form-control w-50" placeholder="What do you want to search for"
+                  aria-label="Enter text of the image to search for" aria-describedby="button-search" id="searchInput" onkeyup="filter()">
+            </div>
+        </div>
+        <div class="col-1 d-flex align-items-center justify-content-center bg-danger">
+          <span class="material-symbols-outlined">
+            cards
+          </span>
+          <span class="material-symbols-outlined">
+            view_list
+          </span>
+        </div>
+      </div>
+    </section>
+  <!-- FINE TEST -->
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
