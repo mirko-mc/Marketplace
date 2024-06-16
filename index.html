@@ -41,6 +41,32 @@
     </div>
   </header>
   <!-- FINE HEADER --------------------------------------------------------------------------- -->
+  <section id="adminBar" class="container mb-3 d-none">
+    <div class="row align-items-center">
+      <div class="col-1 ">
+        <button class="btn btn-primary material-symbols-outlined p-1 " data-bs-target="#ModalToggle"
+          data-bs-toggle="modal" onclick="addProduct()" alt="Aggiungi prodotto">add</button>
+      </div>
+      <div class="col-10">
+        <div class="input-group">
+          <select class="form-select" id="typeMedia">
+            <option selected value="brand">Brand</option>
+            <option value="name">Name</option>
+            <input type="text" class="form-control w-50" placeholder="What do you want to search for"
+              aria-label="Enter text of the image to search for" aria-describedby="button-search" id="searchInput"
+              onkeyup="filter(this)">
+        </div>
+      </div>
+      <div class="col-1 d-flex align-items-center justify-content-center">
+        <span class="material-symbols-outlined">
+          cards
+        </span>
+        <span class="material-symbols-outlined">
+          view_list
+        </span>
+      </div>
+    </div>
+  </section>
   <!-- DOPPIO MODAL ------------------------------------------------------------------- -->
   <section id="editModal">
     <div class="modal fade" id="ModalToggle" aria-hidden="true" aria-labelledby="ModalToggleLabel" tabindex="-1">
@@ -109,33 +135,7 @@
   </section>
   <!-- FINE DOPPIO MODAL ------------------------------------------------------------------- -->
 
-  <!-- TEST -->
-    <section id="adminBar" class="container">
-      <div class="row gx-3 gy-3">
-        <div class="col-1 bg-danger">
-          <button class="btn btn-primary material-symbols-outlined w-100" data-bs-target="#ModalToggle"
-            data-bs-toggle="modal" onclick="addProduct()" alt="Aggiungi prodotto">add</button>
-        </div>
-        <div class="col-10 bg-black">
-            <div class="input-group mb-3">
-              <select class="form-select" id="typeMedia">
-                <option selected value="brand">Brand</option>
-                <option value="name">Name</option>
-                <input type="text" class="form-control w-50" placeholder="What do you want to search for"
-                  aria-label="Enter text of the image to search for" aria-describedby="button-search" id="searchInput" onkeyup="filter()">
-            </div>
-        </div>
-        <div class="col-1 d-flex align-items-center justify-content-center bg-danger">
-          <span class="material-symbols-outlined">
-            cards
-          </span>
-          <span class="material-symbols-outlined">
-            view_list
-          </span>
-        </div>
-      </div>
-    </section>
-  <!-- FINE TEST -->
+    
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

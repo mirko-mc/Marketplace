@@ -1,132 +1,100 @@
-/**
- * DA ELIMINARE ------------------------------------------------------------------------------------------------
- */
-// _id: '6669d98f853a4d001548624b', name: 'EPICODE@epicode.it', description: 'epicode', brand: 'admin'
-const TESTHTML = document.querySelector("span");
-const ID = "666aa2eb853a4d001548630e";
-/** FINE DA ELIMINARE ----------------------------------------------------------------------------------------*/
-
+/** * * * * * * * * * * * * * * * * * * *
+ * PRODUCT PER L'ACCESSO COME ADMIN
+ * _id: '6669d98f853a4d001548624b',
+ * name: 'EPICODE@epicode.it',            // EMAIL
+ * description: 'epicode',                // PASSWORD
+ * brand: 'admin'
+ * * * * * * * * * * * * * * * * * * * */
 /** url da fetchare */
 const FETCHURL = "https://striveschool-api.herokuapp.com/api/product/";
 /** token per l'autenticazione */
 const FETCHTOKEN =
   "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjY3NDRhNjdmNmI0YjAwMTU0MjhmYzciLCJpYXQiOjE3MTgwNDM4MTQsImV4cCI6MTcxOTI1MzQxNH0.SXzbkbBeQ3k_Id3jleh3mqKxiDVVMO0B3PmJiY3Q7Sk";
-/** inserisco i dati fetchati in un oggetto */
+/** oggetto che conterrà i dati fetchati */
 let products = null;
-// console.log(products);
+/** variabile multiuso per i vari innerHTML */
 let innesto = "";
 
-async function innestation() {
-  await getData();
-  /**
-   * dichiaro il main che sarà innestato in html
-   */
-  innesto = `
-  <main class="container">
-    <div class="row gx-3 gy-3">
-    </div>
-  </main>
-    `;
-  /**
-   * recupero headers
-   */
-  const header = document.querySelector("header");
-  /**
-   * inietto main appena finisce header
-   */
-  header.insertAdjacentHTML("afterend", innesto);
-  /**
-   * recupero il main appena inserito in cui saranno aggiunte le cards
-   */
-  innesto = document.querySelector("main .row");
-  /**
-   * se non è già stato definito che tipo di utente sta visitando la pagina allora imposto il tipo di utente su utente normale e mostro le cards
-   */
+/** funzione al caricamento del documento..... */
+document.addEventListener("DOMContentLoaded", async () => {
+  /** se non è già stato definito che tipo di utente sta visitando la pagina allora imposto il tipo di utente su utente normale e mostro le cards */
   if (localStorage.getItem("type") === null)
     localStorage.setItem("type", "user");
   console.log(
     "DOMContentLoaded => localStorage.type\n",
     localStorage.getItem("type")
   );
-
-  if (localStorage.getItem("type") === "admin") {
-    innesto.innerHTML += `
-    <button class="btn btn-primary material-symbols-outlined" data-bs-target="#ModalToggle" data-bs-toggle="modal" onclick="addProduct()">add</button>
-    `;
+  const ADMINBAR = document.getElementById("adminBar");
+  if (isAdmin()) {
+    ADMINBAR.classList.toggle("d-none");
+    document.getElementById("login").classList.toggle("d-none");
+    document.getElementById("logout").classList.toggle("d-none");
   }
+  /** attendi il caricamento dei dati fetchati nell'oggetto */
+  await getData();
+  /** dichiaro il main che sarà innestato in html */
+  innesto = `
+  <main class="container">
+    <div class="row gx-3 gy-3" id="cardsContainer">
+    </div>
+  </main>
+    `;
+    // console.log("ONLOAD => innesto\n", innesto);
+  /** inietto main appena finisce header */
+  ADMINBAR.insertAdjacentHTML("afterend", innesto);
+  /** recupero il main appena inserito in cui saranno aggiunte le cards */
+  innesto = document.getElementById("cardsContainer");
+/** itero l'oggetto per recuperare i prodotti e creare le cards */
   for (const PRODUCT of products) {
     // console.log("PRODUCT", PRODUCT);
     /** il primo prodotto l'ho riservato per l'autenticazione quindi lo salto perché non dovrà essere renderizzato */
     if (PRODUCT.brand === "admin") continue;
     else {
       /** richiamo la funzione per creare la card */
-      innesto.innerHTML += createCard(PRODUCT);
+      innesto.innerHTML += createCard(
+        PRODUCT.id,
+        PRODUCT.image,
+        PRODUCT.description,
+        PRODUCT.brand,
+        PRODUCT.price
+      );
     }
-    if (localStorage.getItem("type") === "admin")
+    console.log("ONLOAD => isAdmin\n", isAdmin());
+    if (isAdmin())
       document.getElementById(`cart${PRODUCT.id}`).classList.toggle("d-none");
-  }
-}
-/** funzione al caricamento del documento..... */
-document.addEventListener("DOMContentLoaded", async () => {
-  await innestation();
-  if (localStorage.getItem("type") === "admin") {
-    document.getElementById("login").classList.toggle("d-none");
-    document.getElementById("logout").classList.toggle("d-none");
   }
 });
 
-function createCard(product) {
+/** funzione per verificare se l'utente è admin */
+async function isAdmin() {
+  if (localStorage.getItem("type") === "admin") return true;
+  else return false;
+}
+
+function createCard(id, image, description, brand, price) {
   /**
    * formatto la card
    */
   let card = `
   <div class="col-3">
-    <div class="card">
-      <img src="${product.image}" class="card-img-top" alt="${product.description}">
+    <div class="card" id="card${id}">
+      <img src="${image}" class="card-img-top" alt="${description}">
       <div class="card-body">
-        <h5 class="card-title">${product.brand} - ${product.name}</h5>
-        <p class="card-text">${product.description}</p>
-        <p class="card-text">${product.price} €</p>
-        <button class="btn btn-primary material-symbols-outlined" id="cart${product.id}">add_shopping_cart</button>
+        <h5 class="card-title">${brand} - ${name}</h5>
+        <p class="card-text">${description}</p>
+        <p class="card-text">${price} €</p>
+        <button class="btn btn-primary material-symbols-outlined" id="cart${id}">add_shopping_cart</button>
   `;
-  if (localStorage.getItem("type") === "admin") {
+  if (isAdmin()) {
     card += `
-        <button type="button" class="btn btn-primary material-symbols-outlined" data-bs-target="#ModalToggle" data-bs-toggle="modal" onclick="editProduct('${product.id}')">edit</button>
-        <button type="button" class="btn btn-primary material-symbols-outlined" onclick="deleteData('${product.id}')">delete</button>
+        <button type="button" class="btn btn-primary material-symbols-outlined" data-bs-target="#ModalToggle" data-bs-toggle="modal" onclick="editProduct('${id}')">edit</button>
+        <button type="button" class="btn btn-primary material-symbols-outlined" onclick="deleteData('${id}')">delete</button>
       </div>
     </div>
   </div>
                     `;
   }
   return card;
-}
-
-/** funzione fetch per ottenere i dati dall'API ed inserirli in un oggetto */
-async function getData() {
-  if (products !== null) {
-    console.log("NON HO FATTO LA FETCH\n");
-    return products;
-  }
-  await fetch(FETCHURL, {
-    method: "GET",
-    headers: { Authorization: FETCHTOKEN, "Content-Type": "application/json" },
-  })
-    .then((response) => {
-      // console.log("GETDATA => response\n", response);
-      return response.json();
-    })
-    .then((data) => {
-      console.log("GETDATA => data\n", data);
-      products = data.map((PRODUCT) => ({
-        id: PRODUCT._id,
-        name: PRODUCT.name,
-        description: PRODUCT.description,
-        brand: PRODUCT.brand,
-        image: PRODUCT.imageUrl,
-        price: PRODUCT.price.toFixed(2),
-      }));
-      return data;
-    });
 }
 
 /** funzione per l'accesso all'area amministratore */
@@ -144,67 +112,6 @@ function login() {
 function logout() {
   localStorage.setItem("type", "user");
   location.reload();
-}
-
-/** posta i dati nella API */
-async function postData(ADD) {
-  await fetch(FETCHURL, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      Authorization: FETCHTOKEN,
-    },
-    body: JSON.stringify(ADD),
-  })
-    .then((response) => {
-      console.log("POSTDATA => response\n", response);
-    })
-    .catch((error) => {
-      console.log("POSTDATA => error\n", error);
-    });
-  window.location.reload();
-}
-
-/** cancella i dati dall'API */
-async function deleteData(id) {
-  await fetch(FETCHURL + id, {
-    method: "DELETE",
-    headers: {
-      "content-type": "application/json",
-      Authorization: FETCHTOKEN,
-    },
-  })
-    .then((response) => {
-      console.log("DELETEDATA => response\n", response);
-    })
-    .catch((error) => {
-      console.log("DELETEDATA => error\n", error);
-    });
-  window.location.reload();
-}
-
-/** modifica i dati nell'API */
-async function putData(id, edit) {
-  console.log("PUTDATA => edit\n", edit);
-  await fetch(FETCHURL + id, {
-    method: "PUT",
-    headers: {
-      "content-type": "application/json",
-      Authorization: FETCHTOKEN,
-    },
-    body: JSON.stringify(edit),
-  })
-    .then((response) => {
-      console.log("PUTDATA => response\n", response);
-      return response;
-    })
-    .then((data) => {
-      console.log("PUTDATA => data\n", data);
-    })
-    .catch((error) => {
-      console.log("POSTDATA => error\n", error);
-    });
-  window.location.reload();
 }
 
 /** funzione per nascondere il pulsante e mostrare il form d'accesso */
@@ -303,5 +210,131 @@ async function addProduct() {
     };
     console.log("ADDPRODUCT => add\n", ADD);
     postData(ADD);
+    await switchModal();
   });
+}
+
+function filter(searchOn) {
+  /** prendo il valore della select */
+  const WHERE = searchOn.previousElementSibling.value;
+  /** prendo il valore dalla input */
+  const WHAT = searchOn.value;
+  /** prendo il contenitore delle cards e lo svuoto */
+  document.getElementById("cardsContainer").innerHTML = "";
+  /** itero l'oggetto con i dati della fetch */
+  for (const PRODUCT of products) {
+    innesto = document.getElementById("cardsContainer");
+    innesto.innerHTML = `<div id="cardsContainer" class="row gx-3 gy-3"></div>`;
+    if (PRODUCT[WHERE].toLowerCase().includes(WHAT))
+      innesto.innerHTML += createCard(
+        PRODUCT.id,
+        PRODUCT.image,
+        PRODUCT.description,
+        PRODUCT.brand,
+        PRODUCT.price
+      );
+  }
+
+  // <div id="cardsContainer" class="row gx-3 gy-3"></div>;
+
+  // const main = document.querySelector("main");
+  // const INPUT = document.getElementById("searchBook").value.toLowerCase();
+  // main.innerHTML = "";
+  // getData().then((books) => {
+  //   books.forEach((book) => {
+  //     book.title.toLowerCase().includes(INPUT)
+  //       ? createCards(book.id, book.image, book.title, book.price)
+  //       : "";
+  //   });
+  // });
+}
+
+/***************************************************/
+/** funzione fetch per ottenere i dati dall'API ed inserirli in un oggetto */
+async function getData() {
+  if (products !== null) {
+    console.log("NON HO FATTO LA FETCH\n");
+    return products;
+  }
+  await fetch(FETCHURL, {
+    method: "GET",
+    headers: { Authorization: FETCHTOKEN, "Content-Type": "application/json" },
+  })
+    .then((response) => {
+      // console.log("GETDATA => response\n", response);
+      return response.json();
+    })
+    .then((data) => {
+      console.log("GETDATA => data\n", data);
+      products = data.map((PRODUCT) => ({
+        id: PRODUCT._id,
+        name: PRODUCT.name,
+        description: PRODUCT.description,
+        brand: PRODUCT.brand,
+        image: PRODUCT.imageUrl,
+        price: PRODUCT.price.toFixed(2),
+      }));
+      return data;
+    });
+}
+
+/** posta i dati nella API */
+async function postData(ADD) {
+  await fetch(FETCHURL, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      Authorization: FETCHTOKEN,
+    },
+    body: JSON.stringify(ADD),
+  })
+    .then((response) => {
+      console.log("POSTDATA => response\n", response);
+    })
+    .catch((error) => {
+      console.log("POSTDATA => error\n", error);
+    });
+  window.location.reload();
+}
+
+/** cancella i dati dall'API */
+async function deleteData(id) {
+  await fetch(FETCHURL + id, {
+    method: "DELETE",
+    headers: {
+      "content-type": "application/json",
+      Authorization: FETCHTOKEN,
+    },
+  })
+    .then((response) => {
+      console.log("DELETEDATA => response\n", response);
+    })
+    .catch((error) => {
+      console.log("DELETEDATA => error\n", error);
+    });
+  window.location.reload();
+}
+
+/** modifica i dati nell'API */
+async function putData(id, edit) {
+  console.log("PUTDATA => edit\n", edit);
+  await fetch(FETCHURL + id, {
+    method: "PUT",
+    headers: {
+      "content-type": "application/json",
+      Authorization: FETCHTOKEN,
+    },
+    body: JSON.stringify(edit),
+  })
+    .then((response) => {
+      console.log("PUTDATA => response\n", response);
+      return response;
+    })
+    .then((data) => {
+      console.log("PUTDATA => data\n", data);
+    })
+    .catch((error) => {
+      console.log("POSTDATA => error\n", error);
+    });
+  window.location.reload();
 }
