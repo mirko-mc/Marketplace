@@ -26,9 +26,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
   const ADMINBAR = document.getElementById("adminBar");
   if (isAdmin()) {
-    ADMINBAR.classList.toggle("d-none");
-    document.getElementById("login").classList.toggle("d-none");
-    document.getElementById("logout").classList.toggle("d-none");
+    console.log("DOMContentLoaded => isAdmin\n", "admin");
+    document.getElementById("login").classList.add("d-none");
+  } else {
+    /** se l'utente non è admin nascondo i pulsanti per amministratori */
+    console.log("DOMContentLoaded => isAdmin\n", "user");
+    for (const COL of document.querySelectorAll("#adminBar .col-1")) {
+      COL.classList.add("d-none");
+    }
+    document.querySelector("#adminBar .col-10").classList.add("offset-1");
+    document.getElementById("logout").classList.add("d-none");
   }
   /** attendi il caricamento dei dati fetchati nell'oggetto */
   await getData();
@@ -39,12 +46,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     </div>
   </main>
     `;
-    // console.log("ONLOAD => innesto\n", innesto);
+  // console.log("ONLOAD => innesto\n", innesto);
   /** inietto main appena finisce header */
   ADMINBAR.insertAdjacentHTML("afterend", innesto);
   /** recupero il main appena inserito in cui saranno aggiunte le cards */
   innesto = document.getElementById("cardsContainer");
-/** itero l'oggetto per recuperare i prodotti e creare le cards */
+  /** itero l'oggetto per recuperare i prodotti e creare le cards */
   for (const PRODUCT of products) {
     // console.log("PRODUCT", PRODUCT);
     /** il primo prodotto l'ho riservato per l'autenticazione quindi lo salto perché non dovrà essere renderizzato */
@@ -53,42 +60,44 @@ document.addEventListener("DOMContentLoaded", async () => {
       /** richiamo la funzione per creare la card */
       innesto.innerHTML += createCard(
         PRODUCT.id,
-        PRODUCT.image,
+        PRODUCT.name,
         PRODUCT.description,
         PRODUCT.brand,
+        PRODUCT.image,
         PRODUCT.price
       );
     }
-    console.log("ONLOAD => isAdmin\n", isAdmin());
-    if (isAdmin())
-      document.getElementById(`cart${PRODUCT.id}`).classList.toggle("d-none");
+    if (isAdmin()) {
+      console.log(isAdmin(), "admin");
+      document.getElementById(`cart${PRODUCT.id}`).classList.add("d-none");
+    }
   }
 });
 
 /** funzione per verificare se l'utente è admin */
-async function isAdmin() {
+function isAdmin() {
   if (localStorage.getItem("type") === "admin") return true;
   else return false;
 }
 
-function createCard(id, image, description, brand, price) {
+function createCard(id, name, description, brand, image, price) {
   /**
    * formatto la card
    */
   let card = `
-  <div class="col-3">
-    <div class="card" id="card${id}">
+  <div class="col-3" onclick="window.location.href = 'product.html?id=${id}'">
+    <div class="card id="card${id}">
       <img src="${image}" class="card-img-top" alt="${description}">
       <div class="card-body">
-        <h5 class="card-title">${brand} - ${name}</h5>
-        <p class="card-text">${description}</p>
+        <h5 class="card-title text-truncate">${brand}</h5>
+        <p class="card-text text-truncate">${name}</p>
         <p class="card-text">${price} €</p>
         <button class="btn btn-primary material-symbols-outlined" id="cart${id}">add_shopping_cart</button>
   `;
   if (isAdmin()) {
     card += `
-        <button type="button" class="btn btn-primary material-symbols-outlined" data-bs-target="#ModalToggle" data-bs-toggle="modal" onclick="editProduct('${id}')">edit</button>
-        <button type="button" class="btn btn-primary material-symbols-outlined" onclick="deleteData('${id}')">delete</button>
+        <button type="button" class="btn btn-primary material-symbols-outlined" data-bs-target="#ModalToggle" data-bs-toggle="modal" onclick="editProduct('${id}')" id="edit${id}">edit</button>
+        <button type="button" class="btn btn-primary material-symbols-outlined" onclick="deleteData('${id}')" id="delete${id}">delete</button>
       </div>
     </div>
   </div>
@@ -104,7 +113,7 @@ function login() {
   // if (email === products[0].name && password === products[0].description)
   if (email === "a@a.a" && password === "a") {
     localStorage.setItem("type", "admin");
-    location.reload();
+    window.location.reload();
   } else alert("Username e password non corretti.");
 }
 
@@ -116,14 +125,14 @@ function logout() {
 
 /** funzione per nascondere il pulsante e mostrare il form d'accesso */
 function reverseLogin() {
-  document.getElementById("login").classList.toggle("d-none");
-  document.getElementById("formAccess").classList.toggle("d-none");
+  document.getElementById("login").classList.add("d-none");
+  document.getElementById("formAccess").classList.remove("d-none");
 }
 
 /** funzione per mostrare il pulsante e nascondere il form d'accesso */
 function reverseForm() {
-  document.getElementById("login").classList.toggle("d-none");
-  document.getElementById("formAccess").classList.toggle("d-none");
+  document.getElementById("login").classList.remove("d-none");
+  document.getElementById("formAccess").classList.add("d-none");
 }
 
 /** mostra il modale per l'editazione del prodotto */
@@ -158,25 +167,26 @@ function editProduct(id) {
   });
 }
 
+/** funzione per convertire il modale per l'edit nel modale per l'aggiunta prodotto */
 async function switchModal() {
   console.log("SWITCHMODAL => \n");
   const MODALTOGGLELABEL = document.getElementById("ModalToggleLabel");
   MODALTOGGLELABEL.innerText = "AGGIUNGI PRODOTTO";
 
   const NOWVALUE = document.querySelector("#editModal .row h6:first-of-type");
-  NOWVALUE.classList.toggle("d-none");
+  NOWVALUE.classList.add("d-none");
 
   const NEWVALUE = document.querySelector("#editModal .row h6:last-of-type");
-  NEWVALUE.classList.toggle("d-none");
+  NEWVALUE.classList.add("d-none");
 
   const NOWCOLUMN = document.getElementById("name").parentElement;
-  NOWCOLUMN.classList.toggle("d-none");
+  NOWCOLUMN.classList.add("d-none");
 
   const SPECS = document.querySelector("#editModal .row label").parentElement;
-  SPECS.classList.toggle("col-sm-4");
+  SPECS.classList.add("col-sm-4");
 
   const NEWCOLUMN = document.getElementById("editName").parentElement;
-  NEWCOLUMN.classList.toggle("col-sm-8");
+  NEWCOLUMN.classList.add("col-sm-8");
 
   const NAME = document.getElementById("editName");
   NAME.setAttribute("required", true);
@@ -214,42 +224,36 @@ async function addProduct() {
   });
 }
 
-function filter(searchOn) {
+/** funzione per filtrare in base a brand o name del prodotto */
+async function filter(searchOn) {
   /** prendo il valore della select */
   const WHERE = searchOn.previousElementSibling.value;
   /** prendo il valore dalla input */
   const WHAT = searchOn.value;
-  /** prendo il contenitore delle cards e lo svuoto */
-  document.getElementById("cardsContainer").innerHTML = "";
+  // /** prendo il contenitore delle cards e lo riformatto per le cards del filtro */
+  innesto = document.getElementById("cardsContainer").parentElement;
+  innesto.innerHTML = `<div id="cardsContainer" class="row gx-3 gy-3">`;
   /** itero l'oggetto con i dati della fetch */
   for (const PRODUCT of products) {
     innesto = document.getElementById("cardsContainer");
-    innesto.innerHTML = `<div id="cardsContainer" class="row gx-3 gy-3"></div>`;
-    if (PRODUCT[WHERE].toLowerCase().includes(WHAT))
+    if (PRODUCT[WHERE].toLowerCase().includes(WHAT)) {
       innesto.innerHTML += createCard(
         PRODUCT.id,
-        PRODUCT.image,
+        PRODUCT.name,
         PRODUCT.description,
         PRODUCT.brand,
+        PRODUCT.image,
         PRODUCT.price
       );
+      if (isAdmin()) {
+        console.log(isAdmin(), "admin");
+        document.getElementById(`cart${PRODUCT.id}`).classList.add("d-none");
+      }
+    }
   }
-
-  // <div id="cardsContainer" class="row gx-3 gy-3"></div>;
-
-  // const main = document.querySelector("main");
-  // const INPUT = document.getElementById("searchBook").value.toLowerCase();
-  // main.innerHTML = "";
-  // getData().then((books) => {
-  //   books.forEach((book) => {
-  //     book.title.toLowerCase().includes(INPUT)
-  //       ? createCards(book.id, book.image, book.title, book.price)
-  //       : "";
-  //   });
-  // });
+  innesto.innerHTML += `</div>`;
 }
 
-/***************************************************/
 /** funzione fetch per ottenere i dati dall'API ed inserirli in un oggetto */
 async function getData() {
   if (products !== null) {
