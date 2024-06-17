@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "DOMContentLoaded => localStorage.type\n",
     localStorage.getItem("type")
   );
-  const ADMINBAR = document.getElementById("adminBar");
+  const ASIDE = document.getElementById("cart");
   if (isAdmin()) {
     console.log("DOMContentLoaded => isAdmin\n", "admin");
     document.getElementById("login").classList.add("d-none");
@@ -41,14 +41,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   await getData();
   /** dichiaro il main che sarà innestato in html */
   innesto = `
-  <main class="container">
-    <div class="row gx-3 gy-3" id="cardsContainer">
-    </div>
+  <main class="d-flex flex-wrap justify-content-evenly gx-3 gy-4 col-md-9" id="cardsContainer">
   </main>
     `;
   // console.log("ONLOAD => innesto\n", innesto);
   /** inietto main appena finisce header */
-  ADMINBAR.insertAdjacentHTML("afterend", innesto);
+  ASIDE.insertAdjacentHTML("beforebegin", innesto);
   /** recupero il main appena inserito in cui saranno aggiunte le cards */
   innesto = document.getElementById("cardsContainer");
   /** itero l'oggetto per recuperare i prodotti e creare le cards */
@@ -85,19 +83,24 @@ function createCard(id, name, description, brand, image, price) {
    * formatto la card
    */
   let card = `
-  <div class="col-3" onclick="window.location.href = 'product.html?id=${id}'">
+  <div class="col-3 p-1">
     <div class="card id="card${id}">
       <img src="${image}" class="card-img-top" alt="${description}">
       <div class="card-body">
         <h5 class="card-title text-truncate">${brand}</h5>
         <p class="card-text text-truncate">${name}</p>
         <p class="card-text">${price} €</p>
-        <button class="btn btn-primary material-symbols-outlined" id="cart${id}">add_shopping_cart</button>
+        <div class="d-flex justify-content-around">
+          <button class="btn btn-primary material-symbols-outlined" id="cart${id}">add_shopping_cart</button>
+          <button class="btn btn-primary material-symbols-outlined" onclick="window.location.href = 'product.html?id=${id}'">info</button>
+        </div>
   `;
   if (isAdmin()) {
     card += `
-        <button type="button" class="btn btn-primary material-symbols-outlined" data-bs-target="#ModalToggle" data-bs-toggle="modal" onclick="editProduct('${id}')" id="edit${id}">edit</button>
-        <button type="button" class="btn btn-primary material-symbols-outlined" onclick="deleteData('${id}')" id="delete${id}">delete</button>
+        <div class="d-flex justify-content-around">
+          <button type="button" class="btn btn-primary material-symbols-outlined" data-bs-target="#ModalToggle" data-bs-toggle="modal" onclick="editProduct('${id}')" id="edit${id}">edit</button>
+          <button type="button" class="btn btn-primary material-symbols-outlined"     onclick="deleteData('${id}')" id="delete${id}">delete</button>
+        </div>
       </div>
     </div>
   </div>
@@ -342,3 +345,110 @@ async function putData(id, edit) {
     });
   window.location.reload();
 }
+
+
+/** CART */
+/*
+function addToCart(cart) {
+  const main = document.querySelector("main");
+  cart.classList.toggle("disabled");
+  const ASIN = cart.id;
+  const SUPERCONTAINER = document.querySelector("#superContainer .row");
+  if (!document.getElementById("cart")) {
+    main.classList.toggle("col-12");
+    main.classList.toggle("col-10");
+    SUPERCONTAINER.innerHTML += `
+    <aside id="cart" class="col-2 gx-3 gy-4">
+      <div class="col-12 d-flex flex-column align-items-center sticky-top">
+      <h3>CARRELLO</h3>
+      <span>LIBRI AGGIUNTI : </span>
+      <button class="btn btn-secondary mb-2" onclick="clearCart()">Svuota carrello</button>
+      </div>
+    </aside>`;
+  }
+  const LIBRIAGGIUNTI = document.querySelector("aside span");
+  const ASIDE = document.querySelector("aside .col-12");
+  LIBRIAGGIUNTI.textContent = `LIBRI AGGIUNTI : ${++count}`;
+
+  getData().then((BOOKS) => {
+    for (const BOOK of BOOKS) {
+      if (BOOK.id === ASIN) {
+        ASIDE.innerHTML += `
+          <div id="${ASIN}" class="card mb-1 w-100">
+            <div class="card-body d-flex flex-wrap justify-content-between p-2">
+              <h6 class="title text-truncate w-100">${BOOK.title}</h6>
+              <span class="card-text">${BOOK.price}</span>
+              <a href="#" class="btn btn-secondary" onclick="deleteBook(this,'${ASIN}')"><span class="material-symbols-outlined">
+delete
+</span></a>
+              </div>
+              </div>
+              `;
+      }
+    }
+  });
+}
+*/
+/*
+async function getData() {
+  if (books !== null) {
+    console.log("NON HO FATTO LA FETCH\n");
+    return books;
+  }
+  try {
+    const res = await fetch("https://striveschool-api.herokuapp.com/books");
+    const data = await res.json();
+    books = data.map((item) => ({
+      id: item.asin,
+      title: item.title,
+      price: item.price.toFixed(2),
+      image: item.img,
+    }));
+    return books;
+  } catch (err) {
+    console.log("ERRORE NEL RECUPERO DEI DATI DAL SERVER\n", err);
+    return [];
+  }
+}
+*/
+/*
+function searchBook() {
+  const main = document.querySelector("main");
+  const INPUT = document.getElementById("searchBook").value.toLowerCase();
+  main.innerHTML = "";
+  getData().then((books) => {
+    books.forEach((book) => {
+      book.title.toLowerCase().includes(INPUT)
+        ? createCards(book.id, book.image, book.title, book.price)
+        : "";
+    });
+  });
+}
+*/
+/*
+function clearCart() {
+  const main = document.querySelector("main");
+  document.getElementById("cart").remove();
+  main.classList.toggle("col-12");
+  main.classList.toggle("col-10");
+  const BUTTONS = document.querySelectorAll("main .card .disabled");
+  for (const BUTTON of BUTTONS) {
+    BUTTON.classList.toggle("disabled");
+  }
+  count = 0;
+}
+*/
+/*
+function deleteBook(trash, asin) {
+  document.getElementById(asin).classList.toggle("disabled");
+  trash.parentNode.parentNode.remove();
+  const LIBRIRIMOSSI = document.querySelector("aside span");
+  LIBRIRIMOSSI.textContent = `LIBRI AGGIUNTI : ${--count}`;
+  if (count === 0) {
+    const main = document.querySelector("main");
+    document.getElementById("cart").remove();
+    main.classList.toggle("col-12");
+    main.classList.toggle("col-10");
+  }
+}
+*/

@@ -46,25 +46,26 @@ async function createCard() {
   let innesto = "";
   const HEADER = document.querySelector("header");
   innesto += `
-    <main class="container">
-        <div class="row mb-3">
-            <div class="card">
-                <div class="row g-0">
-                    <div class="col-md-4">
-                        <img src="${product.image}" class="img-fluid rounded-start" alt="${product.description}">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h5 class="card-title">${product.brand}</h5>
-                            <h6 class="card-title">${product.name}</h6>
-                            <p class="card-text">${product.description}</p>
-                            <p class="card-text">${product.price}</p>
-                        </div>
-                    </div>
-                </div>
+  <main class="container">
+    <div class="row mb-3">
+      <div class="card border-0">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="${product.image}" class="img-fluid rounded-start" alt="${product.description}">
+          </div>
+          <div class="col-md-6 offset-md-2">
+            <div class="card-body">
+              <h5 class="card-title text-truncate">${product.brand}</h5>
+              <h6 class="card-title text-truncate">${product.name}</h6>
+              <p class="card-text">${product.description}</p>
+              <p class="card-text">${product.price}</p>
             </div>
+            <button class="btn btn-primary w-100 material-symbols-outlined" id="${product.id}">add_shopping_cart</button>
+          </div>
         </div>
-    </main>
+      </div>
+    </div>
+  </main>
     `;
   HEADER.insertAdjacentHTML("afterend", innesto);
 }
