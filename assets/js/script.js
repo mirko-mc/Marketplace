@@ -4,6 +4,7 @@
  * name: 'EPICODE@epicode.it',            // EMAIL
  * description: 'epicode',                // PASSWORD
  * brand: 'admin'
+ * DALL'AREA AMMINISTRATORE FORMATO LISTA E' POSSIBILE CAMBIARE I DATI D'ACCESSO MODIFICANDO NAME E DESCRIPTION
  * * * * * * * * * * * * * * * * * * * */
 /** url da fetchare */
 const FETCHURL = "https://striveschool-api.herokuapp.com/api/product/";
@@ -20,17 +21,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   /** se non è già stato definito che tipo di utente sta visitando la pagina allora imposto il tipo di utente su utente normale e mostro le cards */
   if (localStorage.getItem("type") === null)
     localStorage.setItem("type", "user");
-  console.log(
-    "DOMContentLoaded => localStorage.type\n",
-    localStorage.getItem("type")
-  );
   const ASIDE = document.getElementById("cart");
   if (isAdmin()) {
-    console.log("DOMContentLoaded => isAdmin\n", "admin");
     document.getElementById("login").classList.add("d-none");
   } else {
     /** se l'utente non è admin nascondo i pulsanti per amministratori */
-    console.log("DOMContentLoaded => isAdmin\n", "user");
     for (const COL of document.querySelectorAll("#adminBar .col-1")) {
       COL.classList.add("d-none");
     }
@@ -41,17 +36,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   await getData();
   /** dichiaro il main che sarà innestato in html */
   innesto = `
-  <main class="d-flex flex-wrap justify-content-evenly gx-3 gy-4 col-md-9" id="cardsContainer">
+  <main class="d-flex flex-wrap justify-content-evenly gx-3 gy-4 col-md-12" id="cardsContainer">
   </main>
     `;
-  // console.log("ONLOAD => innesto\n", innesto);
   /** inietto main appena finisce header */
   ASIDE.insertAdjacentHTML("beforebegin", innesto);
   /** recupero il main appena inserito in cui saranno aggiunte le cards */
   innesto = document.getElementById("cardsContainer");
   /** itero l'oggetto per recuperare i prodotti e creare le cards */
   for (const PRODUCT of products) {
-    // console.log("PRODUCT", PRODUCT);
     /** il primo prodotto l'ho riservato per l'autenticazione quindi lo salto perché non dovrà essere renderizzato */
     if (PRODUCT.brand === "admin") continue;
     else {
@@ -65,8 +58,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         PRODUCT.price
       );
     }
+    localStorage.getItem("view") === "list" ? asList() : asCards();
+
     if (isAdmin()) {
-      console.log(isAdmin(), "admin");
+      document.getElementById("adminBar").classList.remove("d-none");
       document.getElementById(`cart${PRODUCT.id}`).classList.add("d-none");
     }
   }
@@ -91,7 +86,7 @@ function createCard(id, name, description, brand, image, price) {
         <p class="card-text text-truncate">${name}</p>
         <p class="card-text">${price} €</p>
         <div class="d-flex justify-content-around">
-          <button class="btn btn-primary material-symbols-outlined" id="cart${id}">add_shopping_cart</button>
+          <button class="btn btn-primary material-symbols-outlined" id="cart${id}" onclick="addToCart(this)">add_shopping_cart</button>
           <button class="btn btn-primary material-symbols-outlined" onclick="window.location.href = 'product.html?id=${id}'">info</button>
         </div>
   `;
@@ -113,8 +108,9 @@ function createCard(id, name, description, brand, image, price) {
 function login() {
   let email = document.querySelector("input[type=email]").value;
   let password = document.querySelector("input[type=password]").value;
-  // if (email === products[0].name && password === products[0].description)
-  if (email === "a@a.a" && password === "a") {
+  if (email === products[0].name && password === products[0].description){
+  /** COMMENTARE LA RIGA SOPRA E DECOMMENTARE LA RIGA SOTTO PER IMPOSTARE MAIL E PASSWORD PRESENTI NELL'IF */
+    // if (email === "a@a.a" && password === "a") {
     localStorage.setItem("type", "admin");
     window.location.reload();
   } else alert("Username e password non corretti.");
@@ -140,12 +136,8 @@ function reverseForm() {
 
 /** mostra il modale per l'editazione del prodotto */
 function editProduct(id) {
-  // console.log("EDITPRODUCT => id\n", id);
   for (const PRODUCT of products) {
-    // console.log("EDITPRODUCT => product.id\n", PRODUCT.id);
     if (PRODUCT.id === id) {
-      // console.log("EDITPRODUCT => product\n", PRODUCT);
-      // document.querySelector("main").insertAdjacentHTML("afterend", createEditModal(PRODUCT.name, PRODUCT.description, PRODUCT.brand, PRODUCT.image, PRODUCT.price ));
       document.getElementById("name").value = PRODUCT.name;
       document.getElementById("description").value = PRODUCT.description;
       document.getElementById("brand").value = PRODUCT.brand;
@@ -172,7 +164,6 @@ function editProduct(id) {
 
 /** funzione per convertire il modale per l'edit nel modale per l'aggiunta prodotto */
 async function switchModal() {
-  console.log("SWITCHMODAL => \n");
   const MODALTOGGLELABEL = document.getElementById("ModalToggleLabel");
   MODALTOGGLELABEL.innerText = "AGGIUNGI PRODOTTO";
 
@@ -213,7 +204,6 @@ async function addProduct() {
     edit["brand"] = document.getElementById("editBrand").value;
     edit["imageUrl"] = document.getElementById("editImage").value;
     edit["price"] = document.getElementById("editPrice").value;
-    console.log("ADDPRODUCT => edit\n", edit);
     const ADD = {
       name: document.getElementById("editName").value,
       description: document.getElementById("editDescription").value,
@@ -221,7 +211,6 @@ async function addProduct() {
       imageUrl: document.getElementById("editImage").value,
       price: document.getElementById("editPrice").value,
     };
-    console.log("ADDPRODUCT => add\n", ADD);
     postData(ADD);
     await switchModal();
   });
@@ -249,7 +238,6 @@ async function filter(searchOn) {
         PRODUCT.price
       );
       if (isAdmin()) {
-        console.log(isAdmin(), "admin");
         document.getElementById(`cart${PRODUCT.id}`).classList.add("d-none");
       }
     }
@@ -268,7 +256,6 @@ async function getData() {
     headers: { Authorization: FETCHTOKEN, "Content-Type": "application/json" },
   })
     .then((response) => {
-      // console.log("GETDATA => response\n", response);
       return response.json();
     })
     .then((data) => {
@@ -295,9 +282,6 @@ async function postData(ADD) {
     },
     body: JSON.stringify(ADD),
   })
-    .then((response) => {
-      console.log("POSTDATA => response\n", response);
-    })
     .catch((error) => {
       console.log("POSTDATA => error\n", error);
     });
@@ -313,9 +297,6 @@ async function deleteData(id) {
       Authorization: FETCHTOKEN,
     },
   })
-    .then((response) => {
-      console.log("DELETEDATA => response\n", response);
-    })
     .catch((error) => {
       console.log("DELETEDATA => error\n", error);
     });
@@ -324,7 +305,6 @@ async function deleteData(id) {
 
 /** modifica i dati nell'API */
 async function putData(id, edit) {
-  console.log("PUTDATA => edit\n", edit);
   await fetch(FETCHURL + id, {
     method: "PUT",
     headers: {
@@ -334,11 +314,7 @@ async function putData(id, edit) {
     body: JSON.stringify(edit),
   })
     .then((response) => {
-      console.log("PUTDATA => response\n", response);
       return response;
-    })
-    .then((data) => {
-      console.log("PUTDATA => data\n", data);
     })
     .catch((error) => {
       console.log("POSTDATA => error\n", error);
@@ -346,109 +322,101 @@ async function putData(id, edit) {
   window.location.reload();
 }
 
-
 /** CART */
-/*
 function addToCart(cart) {
-  const main = document.querySelector("main");
-  cart.classList.toggle("disabled");
-  const ASIN = cart.id;
-  const SUPERCONTAINER = document.querySelector("#superContainer .row");
-  if (!document.getElementById("cart")) {
-    main.classList.toggle("col-12");
-    main.classList.toggle("col-10");
-    SUPERCONTAINER.innerHTML += `
-    <aside id="cart" class="col-2 gx-3 gy-4">
-      <div class="col-12 d-flex flex-column align-items-center sticky-top">
-      <h3>CARRELLO</h3>
-      <span>LIBRI AGGIUNTI : </span>
-      <button class="btn btn-secondary mb-2" onclick="clearCart()">Svuota carrello</button>
-      </div>
-    </aside>`;
-  }
-  const LIBRIAGGIUNTI = document.querySelector("aside span");
-  const ASIDE = document.querySelector("aside .col-12");
-  LIBRIAGGIUNTI.textContent = `LIBRI AGGIUNTI : ${++count}`;
-
-  getData().then((BOOKS) => {
-    for (const BOOK of BOOKS) {
-      if (BOOK.id === ASIN) {
-        ASIDE.innerHTML += `
-          <div id="${ASIN}" class="card mb-1 w-100">
+  const main = document.getElementById("cardsContainer");
+  main.classList.remove("col-md-12");
+  main.classList.add("col-md-9");
+  cart.classList.add("disabled");
+  const ASIDE = document.getElementById("cart");
+  ASIDE.classList.remove("d-none");
+  const ID = cart.id.slice(4);
+  const CARTADDED = [];
+  CARTADDED.push(ID);
+  // localStorage.setItem("cart", JSON.stringify(ADDED));
+  localStorage.setItem("cartAdded", CARTADDED);
+  for (const PRODUCT of products) {
+    if (PRODUCT.id === ID) {
+      document.getElementById("cartCardContainer").innerHTML += `
+      <div id="${PRODUCT.id}" class="card mb-1 w-100">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="${PRODUCT.image}" class="img-fluid rounded-start" alt="${PRODUCT.description}">
+          </div>
+          <div class="col-md-7">
             <div class="card-body d-flex flex-wrap justify-content-between p-2">
-              <h6 class="title text-truncate w-100">${BOOK.title}</h6>
-              <span class="card-text">${BOOK.price}</span>
-              <a href="#" class="btn btn-secondary" onclick="deleteBook(this,'${ASIN}')"><span class="material-symbols-outlined">
-delete
-</span></a>
-              </div>
-              </div>
-              `;
-      }
+              <h6 class="title text-truncate w-100">${PRODUCT.name}</h6>
+              <span class="card-text">${PRODUCT.price}</span>
+            </div>
+          </div>
+          <div class="col-md-1">
+            <button class="btn btn-primary material-symbols-outlined"
+              onclick="deleteCardAdded('${ID}')">delete</button>
+          </div>
+        </div>
+      </div>
+      `;
     }
-  });
-}
-*/
-/*
-async function getData() {
-  if (books !== null) {
-    console.log("NON HO FATTO LA FETCH\n");
-    return books;
-  }
-  try {
-    const res = await fetch("https://striveschool-api.herokuapp.com/books");
-    const data = await res.json();
-    books = data.map((item) => ({
-      id: item.asin,
-      title: item.title,
-      price: item.price.toFixed(2),
-      image: item.img,
-    }));
-    return books;
-  } catch (err) {
-    console.log("ERRORE NEL RECUPERO DEI DATI DAL SERVER\n", err);
-    return [];
   }
 }
-*/
-/*
-function searchBook() {
-  const main = document.querySelector("main");
-  const INPUT = document.getElementById("searchBook").value.toLowerCase();
-  main.innerHTML = "";
-  getData().then((books) => {
-    books.forEach((book) => {
-      book.title.toLowerCase().includes(INPUT)
-        ? createCards(book.id, book.image, book.title, book.price)
-        : "";
-    });
-  });
-}
-*/
-/*
+
 function clearCart() {
-  const main = document.querySelector("main");
-  document.getElementById("cart").remove();
-  main.classList.toggle("col-12");
-  main.classList.toggle("col-10");
+  document.getElementById("cart").classList.add("d-none");
+  const main = document.getElementById("cardsContainer");
+  document.getElementById("cartCardContainer").innerHTML = `
+  <h3>CARRELLO</h3>
+  <button class="btn btn-primary mb-2" onclick="clearCart()">Svuota carrello</button>
+  `;
+  main.classList.remove("col-md-9");
+  main.classList.add("col-md-12");
   const BUTTONS = document.querySelectorAll("main .card .disabled");
   for (const BUTTON of BUTTONS) {
-    BUTTON.classList.toggle("disabled");
-  }
-  count = 0;
-}
-*/
-/*
-function deleteBook(trash, asin) {
-  document.getElementById(asin).classList.toggle("disabled");
-  trash.parentNode.parentNode.remove();
-  const LIBRIRIMOSSI = document.querySelector("aside span");
-  LIBRIRIMOSSI.textContent = `LIBRI AGGIUNTI : ${--count}`;
-  if (count === 0) {
-    const main = document.querySelector("main");
-    document.getElementById("cart").remove();
-    main.classList.toggle("col-12");
-    main.classList.toggle("col-10");
+    BUTTON.classList.remove("disabled");
   }
 }
-*/
+
+function deleteCardAdded(id) {
+  document.getElementById(id).remove();
+  document.getElementById(`cart${id}`).classList.remove("disabled");
+  if (!document.querySelector("#cartCardContainer .card")) {
+    document.getElementById("cart").classList.add("d-none");
+    const main = document.getElementById("cardsContainer");
+    main.classList.remove("col-md-9");
+    main.classList.add("col-md-12");
+  }
+}
+/** product come lista */
+function asList() {
+  localStorage.setItem("view", "list");
+  document.getElementById("tableProduct").classList.remove("d-none");
+  document.getElementById("cardsContainer").classList.add("d-none");
+  const THEAD = document.getElementById("tableHead");
+  let tbody = document.getElementById("tableBody");
+  if (tbody === null)
+    THEAD.insertAdjacentHTML("afterend", `<tbody id="tableBody"></tbody>`);
+  tbody = document.getElementById("tableBody");
+  tbody.innerHTML = "";
+  for (const PRODUCT of products) {
+    tbody.innerHTML += `
+    <tr>
+      <td><img src="${PRODUCT.image}" alt="${PRODUCT.description} width="100" height="50"></td>
+      <td>${PRODUCT.brand}</td>
+      <td>${PRODUCT.name}</td>
+      <td>${PRODUCT.description}</td>
+      <td>${PRODUCT.price}</td>
+      <td>
+        <button type="button" class="btn btn-primary material-symbols-outlined" data-bs-target="#ModalToggle" data-bs-toggle="modal" onclick="editProduct('${PRODUCT.id}')" id="edit${PRODUCT.id}">edit</button>
+      </td>
+      <td>
+        <button type="button" class="btn btn-primary material-symbols-outlined" onclick="deleteData('${PRODUCT.id}')" id="delete${PRODUCT.id}">delete</button>
+      </td>
+    </tr>
+    `;
+  }
+}
+
+function asCards() {
+  localStorage.setItem("view", "grid");
+  document.getElementById("tableProduct").classList.add("d-none");
+  document.getElementById("cardsContainer").classList.remove("d-none");
+}
